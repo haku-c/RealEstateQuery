@@ -28,6 +28,7 @@ def get_details(url, debug=False):
         "Schools": [],
     }
     response = session.get(url, headers=headers)
+
     # check to see if your response was processed or not
     if response.status_code != 200:
         print(response.status_code)
@@ -63,6 +64,7 @@ def get_details(url, debug=False):
         elif i == 2 and len(current_info) > 2:
             res["SqFt"] = current_info[1]
 
+    # below logic parses the javascript to load information only accessible on scroll
     json_string = soup.find_all("script", {"id": "__NEXT_DATA__"})[0].string
     test = json.loads(json_string)
     # load the json string
@@ -106,7 +108,11 @@ def get_details(url, debug=False):
 
 
 def query(address):
-    url = get_url(address)
-    details = get_details(url)
-    print(details)
+    try:
+        url = get_url(address)
+        details = get_details(url)
+        print(details)
+
+    except:
+        print("There was an error processing this request. Check the address inputted.")
     return details

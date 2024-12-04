@@ -40,5 +40,4 @@ def get_url(address, debug=False):
 
 # Example usage
 # address = "374 Parkland Dr, Fairbanks, AK 99712"
-# url = get_url(address)
-# print(url)
+# url = get_url(address, debug = True)
