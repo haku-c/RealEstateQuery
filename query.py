@@ -18,7 +18,7 @@ headers = {
 }
 
 
-def get_details(url):
+def get_details(url, debug=False):
     res = {
         "Price": 0,
         "Rooms": 0,
@@ -42,22 +42,25 @@ def get_details(url):
     if len(price) == 0:
         price = soup.find_all("span", {"data-testid": "zestimate-text"})
 
-    # print(price[0].text)
+    if debug:
+        print(price[0].text)
     res["Price"] = price[0].text
 
     # parse for the number of rooms and square footage
     info = soup.find_all("div", {"data-testid": "bed-bath-sqft-fact-container"})
+
     if len(info) == 0:
         info = soup.find_all("span", {"data-testid": "bed-bath-item"})
 
     for i in range(len(info)):
         current_info = re.split(r"([0-9,]+)", info[i].text)
-        # print(" ".join(current_info))
-        if i == 0:
+        if debug:
+            print(" ".join(current_info))
+        if i == 0 and len(current_info) > 2:
             res["Rooms"] = current_info[1]
-        elif i == 1:
+        elif i == 1 and len(current_info) > 2:
             res["Baths"] = current_info[1]
-        else:
+        elif i == 2 and len(current_info) > 2:
             res["SqFt"] = current_info[1]
 
     json_string = soup.find_all("script", {"id": "__NEXT_DATA__"})[0].string
@@ -69,25 +72,27 @@ def get_details(url):
 
     first_key = next(iter(json_convert))
     description = json_convert[first_key]["property"]["description"]
-    # print(description)
+    if debug:
+        print(description)
     res["Description"] = description
 
     schools = json_convert[first_key]["property"]["schools"]
 
     for school in schools:
-        # print(
-        #     " ".join(
-        #         [
-        #             school["name"],
-        #             f'({school["type"]}, {school["level"]})',
-        #             "rated",
-        #             str(school["rating"]),
-        #             "out of 10 at a distance of",
-        #             str(school["distance"]),
-        #             "miles.",
-        #         ]
-        #     )
-        # )
+        if debug:
+            print(
+                " ".join(
+                    [
+                        school["name"],
+                        f'({school["type"]}, {school["level"]})',
+                        "rated",
+                        str(school["rating"]),
+                        "out of 10 at a distance of",
+                        str(school["distance"]),
+                        "miles.",
+                    ]
+                )
+            )
         res["Schools"].append(
             {
                 "Name": school["name"],
