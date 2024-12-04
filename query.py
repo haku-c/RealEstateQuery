@@ -2,9 +2,10 @@ from bs4 import BeautifulSoup
 import requests
 import random
 import json
+import urllib.parse
 
 # url = "https://httpbin.io/user-agent"
-url = "https://www.zillow.com/homedetails/5157-Chena-Hot-Springs-Rd-Fairbanks-AK-99712/74498488_zpid/"
+# url = "https://www.zillow.com/homedetails/5157-Chena-Hot-Springs-Rd-Fairbanks-AK-99712/74498488_zpid/"
 
 session = requests.Session()
 
@@ -23,58 +24,69 @@ headers = {
     "User-Agent": random.choice(userAgents),
 }
 
-response = session.get(url, headers=headers)
 
-# check to see if your response was processed or not
-# print(response.status_code)
-# print(response.text)
+def getUrl(address):
+    base_url = "https://www.zillow.com/homes/"
+    encoded_address = urllib.parse.quote(address)
+    search_url = f"{base_url}{encoded_address}_rb/"
+    return search_url
 
-response_contents = response.text
 
-soup = BeautifulSoup(response_contents, "html.parser")
+def getDetails(url):
+    response = session.get(url, headers=headers)
 
-# parse a description
-description = soup.find_all("div", {"data-testid": "description"})
-print(description[0].text)
+    # check to see if your response was processed or not
+    # print(response.status_code)
+    # print(response.text)
 
-# parse to find the listed price
-price = soup.find_all("span", {"data-testid": "price"})
-print(price[0].text)
+    response_contents = response.text
 
-# parse for the number of rooms and square footage
-info = soup.find_all("div", {"data-testid": "bed-bath-sqft-fact-container"})
+    soup = BeautifulSoup(response_contents, "html.parser")
 
-for i in range(info):
-    print(info[i].text)
+    # parse a description
+    # description = soup.find_all("div", {"data-testid": "description"})
+    # print(description[0].text)
 
-res = []
-json_string = soup.find_all("script", {"id": "__NEXT_DATA__"})[0].string
-test = json.loads(json_string)
-# load the json string
-json_convert = json.loads(
-    test["props"]["pageProps"]["componentProps"]["gdpClientCache"]
-)
+    # parse to find the listed price
+    price = soup.find_all("span", {"data-testid": "zestimate-text"})
+    print(price[0].texts.split(" ")[1])
 
-first_key = next(iter(json_convert))
+    # parse for the number of rooms and square footage
+    # info = soup.find_all("div", {"data-testid": "bed-bath-sqft-fact-container"})
+    info = soup.find_all("span", {"data-testid": "bed-bath-item"})
 
-schools = json_convert[first_key]["property"]["schools"]
+    for i in range(len(info)):
+        print(info[i].text)
 
-for school in schools:
-    print(
-        " ".join(
-            [
-                school["name"],
-                f'({school["type"]}, {school["level"]})',
-                "rated",
-                str(school["rating"]),
-                "out of 10 at a distance of",
-                str(school["distance"]),
-                "miles.",
-            ]
-        )
+    json_string = soup.find_all("script", {"id": "__NEXT_DATA__"})[0].string
+    test = json.loads(json_string)
+    # load the json string
+    json_convert = json.loads(
+        test["props"]["pageProps"]["componentProps"]["gdpClientCache"]
     )
-# with open("record2.json", "w", encoding="utf-8") as file:
-#     file.write(test)
 
-# with open("record.json", "w", encoding="utf-8") as f:
-#     json.dump(json_convert, f)
+    first_key = next(iter(json_convert))
+    description = json_convert[first_key]["property"]["description"]
+    print(description)
+
+    schools = json_convert[first_key]["property"]["schools"]
+
+    for school in schools:
+        print(
+            " ".join(
+                [
+                    school["name"],
+                    f'({school["type"]}, {school["level"]})',
+                    "rated",
+                    str(school["rating"]),
+                    "out of 10 at a distance of",
+                    str(school["distance"]),
+                    "miles.",
+                ]
+            )
+        )
+    # with open("record2.json", "w", encoding="utf-8") as file:
+    #     file.write(test)
+
+    with open("record.json", "w", encoding="utf-8") as f:
+        json.dump(json_convert, f)
