@@ -6,8 +6,6 @@ from userAgents import userAgentList
 from getAddress import get_url
 import re
 
-# url = "https://httpbin.io/user-agent"
-# url = "https://www.zillow.com/homedetails/5157-Chena-Hot-Springs-Rd-Fairbanks-AK-99712/74498488_zpid/"
 
 session = requests.Session()
 
@@ -41,16 +39,20 @@ def get_details(url):
 
     # parse to find the listed price
     price = soup.find_all("span", {"data-testid": "price"})
-    print(price[0].text)
+    if len(price) == 0:
+        price = soup.find_all("span", {"data-testid": "zestimate-text"})
+
+    # print(price[0].text)
     res["Price"] = price[0].text
 
     # parse for the number of rooms and square footage
     info = soup.find_all("div", {"data-testid": "bed-bath-sqft-fact-container"})
-    # info = soup.find_all("span", {"data-testid": "bed-bath-item"})
+    if len(info) == 0:
+        info = soup.find_all("span", {"data-testid": "bed-bath-item"})
 
     for i in range(len(info)):
         current_info = re.split(r"([0-9,]+)", info[i].text)
-        print(" ".join(current_info))
+        # print(" ".join(current_info))
         if i == 0:
             res["Rooms"] = current_info[1]
         elif i == 1:
@@ -67,25 +69,25 @@ def get_details(url):
 
     first_key = next(iter(json_convert))
     description = json_convert[first_key]["property"]["description"]
-    print(description)
+    # print(description)
     res["Description"] = description
 
     schools = json_convert[first_key]["property"]["schools"]
 
     for school in schools:
-        print(
-            " ".join(
-                [
-                    school["name"],
-                    f'({school["type"]}, {school["level"]})',
-                    "rated",
-                    str(school["rating"]),
-                    "out of 10 at a distance of",
-                    str(school["distance"]),
-                    "miles.",
-                ]
-            )
-        )
+        # print(
+        #     " ".join(
+        #         [
+        #             school["name"],
+        #             f'({school["type"]}, {school["level"]})',
+        #             "rated",
+        #             str(school["rating"]),
+        #             "out of 10 at a distance of",
+        #             str(school["distance"]),
+        #             "miles.",
+        #         ]
+        #     )
+        # )
         res["Schools"].append(
             {
                 "Name": school["name"],
@@ -95,14 +97,11 @@ def get_details(url):
                 "Type": school["type"],
             }
         )
-    # with open("record2.json", "w", encoding="utf-8") as file:
-    #     file.write(test)
-
-    # with open("record.json", "w", encoding="utf-8") as f:
-    #     json.dump(json_convert, f)
     return res
 
 
 def query(address):
     url = get_url(address)
-    return get_details(url)
+    details = get_details(url)
+    print(details)
+    return details

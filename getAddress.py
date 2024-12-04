@@ -15,7 +15,6 @@ def get_url(address):
     # Construct the Zillow search URL with the address
     url = f"https://www.zillow.com/homes/{address}_rb/"
 
-    print(url)
     # Set user-agent to mimic a real browser request
     headers = {
         "User-Agent": random.choice(userAgentList),
@@ -34,8 +33,9 @@ def get_url(address):
     # Use regex to find the ZPID in the page source
     zpid_match = re.search(r'"zpid":"(\d+)"', str(soup))
     zpid = zpid_match.group(1)
-
-    return f"https://www.zillow.com/homes/{address}_rb/{zpid}_zpid"
+    final_url = f"https://www.zillow.com/homes/{address}_rb/{zpid}_zpid"
+    print(final_url)
+    return final_url
 
 
 # Example usage
