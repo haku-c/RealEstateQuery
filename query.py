@@ -42,10 +42,12 @@ def get_details(url, debug=False):
     price = soup.find_all("span", {"data-testid": "price"})
     if len(price) == 0:
         price = soup.find_all("span", {"data-testid": "zestimate-text"})
+        res["Price"] = price[0].text.split(":")[1].strip()
+    else:
+        res["Price"] = price[0].text
 
     if debug:
         print(price[0].text)
-    res["Price"] = price[0].text
 
     # parse for the number of rooms and square footage
     info = soup.find_all("div", {"data-testid": "bed-bath-sqft-fact-container"})
