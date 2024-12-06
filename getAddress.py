@@ -9,6 +9,16 @@ session = requests.Session()
 
 
 def get_url(address, debug=False):
+    """
+    Returns a Zillow url associated with the inputted address. 
+
+    Args:
+        address (string): address of the property, formatted house number, city, state. ex/ 123 Example Lane, Sunnyvale, CA
+        debug (bool): Toggle debugging print statements
+
+    Returns:
+        string: url with zpid associated with the address input
+    """
     # Format the address to be suitable for URL
     address = urllib.parse.quote(address)
 

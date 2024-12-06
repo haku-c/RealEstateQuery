@@ -19,6 +19,16 @@ headers = {
 
 
 def get_details(url, debug=False):
+    """
+    Returns a dictionary containing information about the property associated with the url input.
+
+    Args:
+        url (string): Zillow home url to be scraped
+        debug (bool): Toggle debugging print statements
+
+    Returns:
+        dictionary: fields for the price, number of rooms/bathrooms, square footage, a description of the property, nearby schools
+    """
     res = {
         "Price": 0,
         "Rooms": 0,
@@ -110,6 +120,16 @@ def get_details(url, debug=False):
 
 
 def query(address, debug=False):
+    """
+    Returns a dictionary containing information about the property associated with the address
+
+    Args:
+        address (string): address of the property, formatted house number, city, state. ex/ 123 Example Lane, Sunnyvale, CA
+        debug (bool): Toggle debugging print statements
+
+    Returns:
+        dictionary: fields for the price, number of rooms/bathrooms, square footage, a description of the property, nearby schools
+    """
     try:
         url = get_url(address)
         details = get_details(url)
