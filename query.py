@@ -118,4 +118,5 @@ def query(address, debug=False):
 
     except:
         print("There was an error processing this request. Check the address inputted.")
+        details = None
     return details
