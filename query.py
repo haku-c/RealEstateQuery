@@ -109,11 +109,12 @@ def get_details(url, debug=False):
     return res
 
 
-def query(address):
+def query(address, debug=False):
     try:
         url = get_url(address)
         details = get_details(url)
-        print(details)
+        if debug:
+            print(details)
 
     except:
         print("There was an error processing this request. Check the address inputted.")
